@@ -1,0 +1,68 @@
+<link rel="stylesheet" href="/style.css">
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>לקוחות</title>
+</head>
+<body>
+  <a href="/reminders.html">
+  <button>למעבר לתזכורות 🕑</button>
+</a>
+
+  <h2>ניהול לקוחות</h2>
+
+  <input placeholder="שם" id="name">
+  <input placeholder="טלפון" id="phone">
+  <input placeholder="אימייל" id="email">
+  <input type="datetime-local" id="date">
+  <button onclick="createClient()">צור לקוח</button>
+
+  <h3>לקוחות קיימים</h3>
+  <ul id="clientList"></ul>
+
+  <script>
+    const API = '/clients';
+    const token = localStorage.getItem('token');
+
+    async function loadClients() {
+      const res = await fetch(API, {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      const data = await res.json();
+      const list = document.getElementById('clientList');
+      list.innerHTML = '';
+      data.forEach(c => {
+        const li = document.createElement('li');
+        li.textContent = `${c.name} (${c.phone}) - ${new Date(c.appointmentDate).toLocaleString()}`;
+        list.appendChild(li);
+      });
+    }
+
+    async function createClient() {
+      const name = document.getElementById('name').value;
+      const phone = document.getElementById('phone').value;
+      const email = document.getElementById('email').value;
+      const date = document.getElementById('date').value;
+
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token
+        },
+        body: JSON.stringify({ name, phone, email, appointmentDate: date })
+      });
+
+      if (res.ok) {
+        alert('לקוח נוצר');
+        loadClients();
+      } else {
+        alert('שגיאה ביצירה');
+      }
+    }
+
+    loadClients();
+  </script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>התזכורות שלי</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <h2>ניהול תזכורות</h2>
+
+  <div>
+    <input id="content" placeholder="תוכן התזכורת">
+    <input id="datetime" type="datetime-local">
+    <button onclick="addReminder()">הוסף תזכורת</button>
+  </div>
+
+  <h3>התזכורות שלך:</h3>
+  <table id="reminderTable">
+    <thead>
+      <tr>
+        <th>תוכן</th>
+        <th>תאריך ושעה</th>
+        <th>פעולות</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert("יש להתחבר קודם");
+      window.location.href = "/login.html";
+    }
+
+    async function loadReminders() {
+      const res = await fetch('/reminders', {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      const data = await res.json();
+
+      const tbody = document.querySelector('#reminderTable tbody');
+      tbody.innerHTML = '';
+
+      data.forEach(reminder => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${reminder.content}</td>
+          <td>${new Date(reminder.datetime).toLocaleString()}</td>
+          <td><button onclick="deleteReminder('${reminder._id}')">🗑️ מחק</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function addReminder() {
+      const content = document.getElementById('content').value;
+      const datetime = document.getElementById('datetime').value;
+
+      const res = await fetch('/reminders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token
+        },
+        body: JSON.stringify({ content, datetime })
+      });
+
+      if (res.ok) {
+        alert('התזכורת נוספה!');
+        loadReminders();
+      } else {
+        alert('שגיאה ביצירת תזכורת');
+      }
+    }
+
+    async function deleteReminder(id) {
+      const res = await fetch('/reminders/' + id, {
+        method: 'DELETE',
+        headers: { Authorization: 'Bearer ' + token }
+      });
+
+      if (res.ok) {
+        alert('נמחק בהצלחה');
+        loadReminders();
+      } else {
+        alert('שגיאה במחיקה');
+      }
+    }
+
+    loadReminders();
+  </script>
+</body>
+</html>

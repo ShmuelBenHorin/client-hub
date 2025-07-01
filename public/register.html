@@ -1,0 +1,37 @@
+<link rel="stylesheet" href="/style.css">
+
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>רישום</title>
+</head>
+<body>
+  <h2>צור משתמש חדש</h2>
+  <input id="username" placeholder="שם משתמש">
+  <input id="password" type="password" placeholder="סיסמה">
+  <button onclick="register()">הרשם</button>
+
+  <script>
+    async function register() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const res = await fetch('/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert('נרשמת בהצלחה!');
+        window.location.href = '/login.html';
+      } else {
+        alert(data.error || 'שגיאה');
+      }
+    }
+  </script>
+</body>
+</html>
