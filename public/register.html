@@ -1,18 +1,29 @@
-<link rel="stylesheet" href="/style.css">
-
 <!DOCTYPE html>
 <html lang="he">
 <head>
   <meta charset="UTF-8">
   <title>רישום</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+
   <h2>צור משתמש חדש</h2>
+
   <input id="username" placeholder="שם משתמש">
   <input id="password" type="password" placeholder="סיסמה">
   <button onclick="register()">הרשם</button>
 
+  <div id="message"></div>
+
   <script>
+    function showMessage(text, type = "success") {
+      const msg = document.getElementById("message");
+      msg.textContent = text;
+      msg.className = `message-${type}`;
+      msg.style.display = "block";
+      setTimeout(() => msg.style.display = "none", 3000);
+    }
+
     async function register() {
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
@@ -26,10 +37,10 @@
       const data = await res.json();
 
       if (res.ok) {
-        alert('נרשמת בהצלחה!');
-        window.location.href = '/login.html';
+        showMessage('נרשמת בהצלחה!');
+        setTimeout(() => window.location.href = '/login.html', 1500);
       } else {
-        alert(data.error || 'שגיאה');
+        showMessage(data.error || 'שגיאה', 'error');
       }
     }
   </script>

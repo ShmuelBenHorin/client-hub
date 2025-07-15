@@ -1,17 +1,29 @@
-<link rel="stylesheet" href="/style.css">
 <!DOCTYPE html>
 <html lang="he">
 <head>
   <meta charset="UTF-8">
   <title>התחברות</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+
   <h2>התחברות</h2>
+
   <input id="username" placeholder="שם משתמש">
   <input id="password" type="password" placeholder="סיסמה">
   <button onclick="login()">התחבר</button>
 
+  <div id="message"></div>
+
   <script>
+    function showMessage(text, type = "success") {
+      const msg = document.getElementById("message");
+      msg.textContent = text;
+      msg.className = `message-${type}`;
+      msg.style.display = "block";
+      setTimeout(() => msg.style.display = "none", 3000);
+    }
+
     async function login() {
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
@@ -26,10 +38,10 @@
 
       if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
-        alert('התחברת בהצלחה!');
-        window.location.href = '/clients.html';
+        showMessage('התחברת בהצלחה!');
+        setTimeout(() => window.location.href = '/clients.html', 1500);
       } else {
-        alert(data.error || 'שגיאה בהתחברות');
+        showMessage(data.error || 'שגיאה בהתחברות', 'error');
       }
     }
   </script>
